@@ -1,328 +1,129 @@
-// Smooth scrolling for navigation links
 document.addEventListener('DOMContentLoaded', function() {
-    // Add smooth scrolling to all links
-    const links = document.querySelectorAll('a[href^="#"]');
-    
-    links.forEach(link => {
+
+    // --- Smooth Scrolling for Anchor Links ---
+    const smoothScrollLinks = document.querySelectorAll('a[href^="#"]');
+    smoothScrollLinks.forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
-            
             const targetId = this.getAttribute('href');
-            const targetSection = document.querySelector(targetId);
-            
-            if (targetSection) {
-                targetSection.scrollIntoView({
-                    behavior: 'smooth'
-                });
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth' });
             }
         });
     });
 
-    // Header scroll effect
+    // --- Header Style on Scroll ---
     const header = document.querySelector('.header');
-    
-    window.addEventListener('scroll', function() {
-        if (window.scrollY > 100) {
-            header.style.background = 'rgba(255, 255, 255, 0.95)';
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+            header.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
             header.style.backdropFilter = 'blur(10px)';
         } else {
-            header.style.background = '#fff';
+            header.style.backgroundColor = '#fff';
             header.style.backdropFilter = 'none';
         }
     });
 
-    // Animate elements on scroll
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
+    // --- Mobile Menu Functionality ---
+    const nav = document.querySelector('.nav .container');
+    const navLinks = document.querySelector('.nav-links');
+    const mobileMenuBtn = document.createElement('button');
+    mobileMenuBtn.className = 'mobile-menu-btn';
+    mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+    nav.appendChild(mobileMenuBtn);
 
-    const observer = new IntersectionObserver(function(entries) {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
-        });
-    }, observerOptions);
-
-    // Observe feature cards and benefit items
-    const animatedElements = document.querySelectorAll('.feature-card, .benefit-item');
-    animatedElements.forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(30px)';
-        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        observer.observe(el);
+    mobileMenuBtn.addEventListener('click', () => {
+        navLinks.classList.toggle('mobile-active');
+        // Change icon to 'X' when menu is open
+        const icon = mobileMenuBtn.querySelector('i');
+        if (navLinks.classList.contains('mobile-active')) {
+            icon.classList.remove('fa-bars');
+            icon.classList.add('fa-times');
+        } else {
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
+        }
     });
 
-    // Mobile menu toggle (if needed in future)
-    const createMobileMenu = () => {
-        const nav = document.querySelector('.nav');
-        const navLinks = document.querySelector('.nav-links');
-        
-        // Create mobile menu button
-        const mobileMenuBtn = document.createElement('button');
-        mobileMenuBtn.className = 'mobile-menu-btn';
-        mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
-        mobileMenuBtn.style.display = 'none';
-        mobileMenuBtn.style.background = 'none';
-        mobileMenuBtn.style.border = 'none';
-        mobileMenuBtn.style.fontSize = '1.5rem';
-        mobileMenuBtn.style.color = '#333';
-        mobileMenuBtn.style.cursor = 'pointer';
-        
-        nav.querySelector('.container').appendChild(mobileMenuBtn);
-        
-        // Toggle mobile menu
-        mobileMenuBtn.addEventListener('click', () => {
-            navLinks.classList.toggle('mobile-active');
-        });
-        
-        // Show/hide mobile menu button based on screen size
-        const checkScreenSize = () => {
-            if (window.innerWidth <= 768) {
-                mobileMenuBtn.style.display = 'block';
-                navLinks.style.display = navLinks.classList.contains('mobile-active') ? 'flex' : 'none';
-            } else {
-                mobileMenuBtn.style.display = 'none';
-                navLinks.style.display = 'flex';
-                navLinks.classList.remove('mobile-active');
-            }
-        };
-        
-        window.addEventListener('resize', checkScreenSize);
-        checkScreenSize();
-    };
-
-    // Initialize mobile menu
-    createMobileMenu();
-
-    // Gallery Functionality
+    // --- Gallery (Slider) Functionality ---
     const galleryTrack = document.querySelector('.gallery-track');
-    const gallerySlides = document.querySelectorAll('.gallery-slide');
-    const prevButton = document.querySelector('.gallery-nav.prev');
+    const slides = Array.from(galleryTrack.children);
     const nextButton = document.querySelector('.gallery-nav.next');
-    const dots = document.querySelectorAll('.gallery-dots .dot');
+    const prevButton = document.querySelector('.gallery-nav.prev');
+    const dotsNav = document.querySelector('.gallery-dots');
+    const dots = Array.from(dotsNav.children);
 
-    let currentIndex = 0;
-    const slideCount = gallerySlides.length;
+    let currentSlide = 0;
+    const slideCount = slides.length;
 
-    // Set initial active states
-    function updateActiveState() {
-        // Update all slides
-        gallerySlides.forEach((slide, index) => {
-            slide.classList.remove('active', 'prev', 'next');
-            
-            if (index === currentIndex) {
-                slide.classList.add('active');
-            } else if (index === currentIndex - 1) {
-                slide.classList.add('prev');
-            } else if (index === currentIndex + 1) {
-                slide.classList.add('next');
-            }
-        });
-        
-        // Update dots
-        dots.forEach((dot, index) => {
-            dot.classList.toggle('active', index === currentIndex);
-        });
-        
-        // Update navigation buttons
-        prevButton.disabled = currentIndex === 0;
-        nextButton.disabled = currentIndex === slideCount - 1;
-    }
-
-    // Navigation functions
-    function goToSlide(index) {
-        if (index < 0 || index >= slideCount) return;
-        currentIndex = index;
-        updateActiveState();
-    }
-
-    function nextSlide() {
-        if (currentIndex < slideCount - 1) {
-            currentIndex++;
-            updateActiveState();
-        }
-    }
-
-    function prevSlide() {
-        if (currentIndex > 0) {
-            currentIndex--;
-            updateActiveState();
-        }
-    }
-
-    // Event Listeners
-    prevButton.addEventListener('click', prevSlide);
-    nextButton.addEventListener('click', nextSlide);
-
+    // Initialize dots
     dots.forEach((dot, index) => {
         dot.addEventListener('click', () => goToSlide(index));
     });
 
+    // Navigation functions
+    function goToSlide(index) {
+        if (index < 0 || index >= slideCount) return;
+        
+        // Update active states
+        slides[currentSlide].classList.remove('active');
+        dots[currentSlide].classList.remove('active');
+        
+        currentSlide = index;
+        
+        // Update track position
+        galleryTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+        
+        // Update active states
+        slides[currentSlide].classList.add('active');
+        dots[currentSlide].classList.add('active');
+        
+        // Update button states
+        prevButton.disabled = currentSlide === 0;
+        nextButton.disabled = currentSlide === slideCount - 1;
+    }
+
+    // Event listeners for navigation buttons
+    nextButton.addEventListener('click', () => {
+        if (currentSlide < slideCount - 1) {
+            goToSlide(currentSlide + 1);
+        }
+    });
+
+    prevButton.addEventListener('click', () => {
+        if (currentSlide > 0) {
+            goToSlide(currentSlide - 1);
+        }
+    });
+
     // Keyboard navigation
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowLeft') {
-            prevSlide();
-        } else if (e.key === 'ArrowRight') {
-            nextSlide();
+        if (e.key === 'ArrowRight') {
+            nextButton.click();
+        } else if (e.key === 'ArrowLeft') {
+            prevButton.click();
         }
     });
 
-    // Touch support for mobile
-    let touchStartX = 0;
-    let touchEndX = 0;
-
-    galleryTrack.addEventListener('touchstart', (e) => {
-        touchStartX = e.touches[0].clientX;
-    }, { passive: true });
-
-    galleryTrack.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].clientX;
-        handleSwipe();
-    }, { passive: true });
-
-    function handleSwipe() {
-        const swipeThreshold = 50; // Minimum swipe distance in pixels
-        const swipeDistance = touchEndX - touchStartX;
-        
-        if (Math.abs(swipeDistance) < swipeThreshold) return;
-        
-        if (swipeDistance > 0) {
-            // Swiped right
-            prevSlide();
-        } else {
-            // Swiped left
-            nextSlide();
-        }
-    }
-
-    // Initialize
-    updateActiveState();
+    // Initialize first slide
+    goToSlide(0);
     
     // Auto-advance slides every 5 seconds
-    setInterval(() => {
-        if (currentIndex < slideCount - 1) {
-            nextSlide();
-        } else {
-            goToSlide(0);
-        }
+    let slideInterval = setInterval(() => {
+        const nextSlide = (currentSlide + 1) % slideCount;
+        goToSlide(nextSlide);
     }, 5000);
-
-    // Add click tracking for download buttons (for analytics)
-    const downloadButtons = document.querySelectorAll('.btn[href="#"]');
-    downloadButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // Here you would typically track the click event
-            console.log('Download button clicked:', this.textContent.trim());
-            
-            // You can replace this with actual app store links
-            const isGooglePlay = this.textContent.includes('Google Play');
-            const isAppStore = this.textContent.includes('App Store');
-            
-            if (isGooglePlay) {
-                // Replace with actual Google Play Store link
-                // window.open('https://play.google.com/store/apps/details?id=com.sadadiq.app', '_blank');
-                alert('سيتم توجيهك إلى Google Play Store قريباً');
-            } else if (isAppStore) {
-                // Replace with actual App Store link
-                // window.open('https://apps.apple.com/app/sadadiq/id123456789', '_blank');
-                alert('سيتم توجيهك إلى App Store قريباً');
-            }
-        });
+    
+    // Pause auto-advance on hover
+    galleryTrack.addEventListener('mouseenter', () => {
+        clearInterval(slideInterval);
     });
-
-    // Add loading animation
-    const addLoadingAnimation = () => {
-        const hero = document.querySelector('.hero');
-        hero.style.opacity = '0';
-        hero.style.transform = 'translateY(20px)';
-        hero.style.transition = 'opacity 1s ease, transform 1s ease';
-        
-        setTimeout(() => {
-            hero.style.opacity = '1';
-            hero.style.transform = 'translateY(0)';
-        }, 100);
-    };
-
-    addLoadingAnimation();
-
-    // Add form validation if contact form exists
-    const validateForm = (form) => {
-        const inputs = form.querySelectorAll('input[required], textarea[required]');
-        let isValid = true;
-        
-        inputs.forEach(input => {
-            if (!input.value.trim()) {
-                isValid = false;
-                input.style.borderColor = '#ef4444';
-            } else {
-                input.style.borderColor = '#d1d5db';
-            }
-        });
-        
-        return isValid;
-    };
-
-    // Add email validation
-    const validateEmail = (email) => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    };
-
-    // Performance optimization: Lazy load images when they exist
-    const lazyLoadImages = () => {
-        const images = document.querySelectorAll('img[data-src]');
-        
-        const imageObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    img.src = img.dataset.src;
-                    img.classList.remove('lazy');
-                    observer.unobserve(img);
-                }
-            });
-        });
-        
-        images.forEach(img => imageObserver.observe(img));
-    };
-
-    lazyLoadImages();
+    
+    galleryTrack.addEventListener('mouseleave', () => {
+        slideInterval = setInterval(() => {
+            const nextSlide = (currentSlide + 1) % slideCount;
+            goToSlide(nextSlide);
+        }, 5000);
+    });
 });
-
-// Add CSS for mobile menu
-const mobileMenuStyles = `
-    @media (max-width: 768px) {
-        .nav-links.mobile-active {
-            display: flex !important;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            flex-direction: column;
-            padding: 1rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            z-index: 1000;
-        }
-        
-        .nav-links.mobile-active a {
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #f1f5f9;
-        }
-        
-        .nav-links.mobile-active a:last-child {
-            border-bottom: none;
-        }
-    }
-`;
-
-// Inject mobile menu styles
-const styleSheet = document.createElement('style');
-styleSheet.textContent = mobileMenuStyles;
-document.head.appendChild(styleSheet);
-
