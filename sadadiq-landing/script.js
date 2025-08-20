@@ -97,6 +97,119 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize mobile menu
     createMobileMenu();
 
+    // Gallery Functionality
+    const galleryTrack = document.querySelector('.gallery-track');
+    const gallerySlides = document.querySelectorAll('.gallery-slide');
+    const prevButton = document.querySelector('.gallery-nav.prev');
+    const nextButton = document.querySelector('.gallery-nav.next');
+    const dots = document.querySelectorAll('.gallery-dots .dot');
+
+    let currentIndex = 0;
+    const slideCount = gallerySlides.length;
+
+    // Set initial active states
+    function updateActiveState() {
+        // Update all slides
+        gallerySlides.forEach((slide, index) => {
+            slide.classList.remove('active', 'prev', 'next');
+            
+            if (index === currentIndex) {
+                slide.classList.add('active');
+            } else if (index === currentIndex - 1) {
+                slide.classList.add('prev');
+            } else if (index === currentIndex + 1) {
+                slide.classList.add('next');
+            }
+        });
+        
+        // Update dots
+        dots.forEach((dot, index) => {
+            dot.classList.toggle('active', index === currentIndex);
+        });
+        
+        // Update navigation buttons
+        prevButton.disabled = currentIndex === 0;
+        nextButton.disabled = currentIndex === slideCount - 1;
+    }
+
+    // Navigation functions
+    function goToSlide(index) {
+        if (index < 0 || index >= slideCount) return;
+        currentIndex = index;
+        updateActiveState();
+    }
+
+    function nextSlide() {
+        if (currentIndex < slideCount - 1) {
+            currentIndex++;
+            updateActiveState();
+        }
+    }
+
+    function prevSlide() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            updateActiveState();
+        }
+    }
+
+    // Event Listeners
+    prevButton.addEventListener('click', prevSlide);
+    nextButton.addEventListener('click', nextSlide);
+
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => goToSlide(index));
+    });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') {
+            prevSlide();
+        } else if (e.key === 'ArrowRight') {
+            nextSlide();
+        }
+    });
+
+    // Touch support for mobile
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    galleryTrack.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+    }, { passive: true });
+
+    galleryTrack.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].clientX;
+        handleSwipe();
+    }, { passive: true });
+
+    function handleSwipe() {
+        const swipeThreshold = 50; // Minimum swipe distance in pixels
+        const swipeDistance = touchEndX - touchStartX;
+        
+        if (Math.abs(swipeDistance) < swipeThreshold) return;
+        
+        if (swipeDistance > 0) {
+            // Swiped right
+            prevSlide();
+        } else {
+            // Swiped left
+            nextSlide();
+        }
+    }
+
+    // Initialize
+    updateActiveState();
+    
+    // Auto-advance slides every 5 seconds
+    setInterval(() => {
+        if (currentIndex < slideCount - 1) {
+            nextSlide();
+        } else {
+            goToSlide(0);
+        }
+    }, 5000);
+
     // Add click tracking for download buttons (for analytics)
     const downloadButtons = document.querySelectorAll('.btn[href="#"]');
     downloadButtons.forEach(button => {
