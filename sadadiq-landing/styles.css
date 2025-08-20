@@ -47,6 +47,12 @@ body {
     color: #2563eb;
 }
 
+.nav-brand .logo {
+    height: 40px;
+    width: auto;
+    margin-left: 10px;
+}
+
 .nav-brand i {
     margin-left: 10px;
     font-size: 1.8rem;
