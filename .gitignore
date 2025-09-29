@@ -3,6 +3,10 @@ node_modules/
 
 # Environment variables
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Editor directories and files
 .vscode/
@@ -11,7 +15,18 @@ node_modules/
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
+*.swp
+*.swo
+*~
+
+# Build output
+dist/
+build/
+*.log
+
+# APK files
+*.apk
+!sadadiq-landing/apk/sadadiQ_v3.apk  # Keep only v3 APK
 
 # OS generated files
 .DS_Store
@@ -21,3 +36,15 @@ node_modules/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local development
+.cache/
+.temp/
+.tmp/
